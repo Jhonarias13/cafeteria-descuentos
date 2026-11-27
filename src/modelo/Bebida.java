@@ -3,14 +3,20 @@ package modelo;
 public class Bebida extends Producto {
 
     public enum Tamano {
-        PEQUENO(0.0),
-        MEDIANO(0.50),
-        GRANDE(1.00);
+        PEQUENO("pequeña", 0.0),
+        MEDIANO("mediana", 0.50),
+        GRANDE("grande", 1.00);
 
+        private final String etiqueta;
         private final double recargo;
 
-        Tamano(double recargo) {
+        Tamano(String etiqueta, double recargo) {
+            this.etiqueta = etiqueta;
             this.recargo = recargo;
+        }
+
+        public String getEtiqueta() {
+            return etiqueta;
         }
 
         public double getRecargo() {
@@ -36,6 +42,6 @@ public class Bebida extends Producto {
 
     @Override
     public String getCategoria() {
-        return "Bebida " + tamano.name().toLowerCase();
+        return "Bebida " + tamano.getEtiqueta();
     }
 }
