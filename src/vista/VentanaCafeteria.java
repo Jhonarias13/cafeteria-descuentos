@@ -50,6 +50,7 @@ public class VentanaCafeteria extends JFrame {
     private final JButton botonCalcular = new JButton("Calcular Descuento");
     private final JButton botonLimpiar = new JButton("Limpiar");
     private final JTextArea areaResultado = new JTextArea(14, 48);
+    private final JLabel etiquetaTotal = new JLabel("Total a pagar: -");
 
     private boolean baseDisponible;
 
@@ -63,7 +64,7 @@ public class VentanaCafeteria extends JFrame {
         setContentPane(construirPanel());
         registrarEventos();
         pack();
-        setMinimumSize(new Dimension(620, 560));
+        setMinimumSize(new Dimension(720, 600));
         setLocationRelativeTo(null);
     }
 
@@ -79,9 +80,13 @@ public class VentanaCafeteria extends JFrame {
         encabezado.add(titulo, BorderLayout.NORTH);
         encabezado.add(subtitulo, BorderLayout.SOUTH);
 
-        panel.add(encabezado, BorderLayout.NORTH);
-        panel.add(construirFormulario(), BorderLayout.CENTER);
-        panel.add(construirAreaResultado(), BorderLayout.SOUTH);
+        // El formulario va arriba con su alto natural y el área de mensajes ocupa el espacio que sobra.
+        JPanel parteSuperior = new JPanel(new BorderLayout(10, 10));
+        parteSuperior.add(encabezado, BorderLayout.NORTH);
+        parteSuperior.add(construirFormulario(), BorderLayout.CENTER);
+
+        panel.add(parteSuperior, BorderLayout.NORTH);
+        panel.add(construirAreaResultado(), BorderLayout.CENTER);
         return panel;
     }
 
@@ -121,6 +126,15 @@ public class VentanaCafeteria extends JFrame {
         c.fill = GridBagConstraints.NONE;
         formulario.add(botones, c);
 
+        etiquetaTotal.setFont(etiquetaTotal.getFont().deriveFont(Font.BOLD, 16f));
+        etiquetaTotal.setForeground(new Color(0, 110, 60));
+        c.gridx = 1;
+        c.gridy = 2;
+        c.gridwidth = 3;
+        c.fill = GridBagConstraints.HORIZONTAL;
+        formulario.add(etiquetaTotal, c);
+
+        comboProductos.setPrototypeDisplayValue(CatalogoProductos.porDefecto().get(4));
         campoMonto.setToolTipText("Escriba el total o agréguelo con los productos. Ej: 12.50");
         getRootPane().setDefaultButton(botonCalcular);
         return formulario;
@@ -141,6 +155,7 @@ public class VentanaCafeteria extends JFrame {
         botonAgregar.addActionListener(evento -> agregarProducto());
         botonLimpiar.addActionListener(evento -> {
             campoMonto.setText("");
+            etiquetaTotal.setText("Total a pagar: -");
             campoMonto.requestFocusInWindow();
         });
     }
@@ -213,8 +228,10 @@ public class VentanaCafeteria extends JFrame {
         }
 
         escribir(String.format(Locale.US,
-                "%n----- Resultado -----%nSubtotal:   $%10.2f%nDescuento:  $%10.2f  (%s)%nTotal:      $%10.2f",
+                "Subtotal $%.2f - descuento $%.2f (%s) = total $%.2f",
                 resultado.subtotal(), resultado.descuento(), resultado.reglaAplicada(), resultado.totalFinal()));
+        etiquetaTotal.setText(String.format(Locale.US, "Total a pagar: $%.2f  (ahorro $%.2f)",
+                resultado.totalFinal(), resultado.descuento()));
         guardarPedido(resultado);
     }
 
